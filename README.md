@@ -6,7 +6,7 @@ Then join the [Discord server](https://discord.gg/jxQBK3k8tx) to share your art!
 
 JS Paint recreates every tool and menu of MS Paint, and even [little-known features](#did-you-know), to a high degree of fidelity.
 
-It supports themes, additional file types, and accessibility features like a Dwell Clicker and Speech Recognition.
+It supports themes, additional file types, and accessibility features like Quick Undo, Enlarge UI, and Speech Recognition.
 
 ![Screenshot](images/meta/main-screenshot.png)
 
@@ -60,12 +60,7 @@ I want to bring good old Paint into the modern era.
   * Occult theme, in the spirit of Halloween
   * Winter theme, with a special color palette including candy cane stripes, and advent calendar style flaps revealing pixel art for each tool
   * Bubblegum theme, featuring *Business Pink* color scheme and AI-generated icons
-* **Extras > Enlarge UI** to make buttons and menus bigger, for usage with an eye tracker, head tracker, or other course input devices. May also work well for a tablet, but not so much for a phone at the moment.
-* **Extras > Dwell Clicker** to click automatically by hovering in one spot, for usage with an eye tracker or head tracker.
-  * Hovered buttons are highlighted, and the click is performed after a delay.
-  * Supports dragging windows and drawing on the canvas.
-  * With just a webcam, you can try it out with [Enable Viacam](https://eviacam.crea-si.com/) (head tracker), [GazePointer](https://sourceforge.net/projects/gazepointer/) (eye tracker), or the built in [<img src="images/tracky-mouse-16x16.png" width="16" height="16"> Tracky Mouse](https://trackymouse.js.org/) head tracker using **Extras > Head Tracker**.
-  * This feature can be easily added to other web applications, using the [<img src="images/tracky-mouse-16x16.png" width="16" height="16"> Tracky Mouse API](https://www.npmjs.com/package/tracky-mouse).
+* **Extras > Enlarge UI** to make buttons and menus bigger for improved accessibility and use on smaller displays.
 * **Extras > Speech Recognition** to control the app with your voice.
   * Select tools and colors ("fill tool", "orange", etc.)
   * Pan the view ("scroll down and to the left", or "go southwest", etc.)
@@ -295,62 +290,6 @@ Missing features:
 - <details><summary>Directly saving to files is implemented but not enabled currently.</summary>I was concerned about data loss for two reasons: 1. the change in behavior of File > Save / Ctrl+S from effectively acting as Save As to overwriting files directly, although I made a warning dialog for this, with a don't show again option; 2. there was a bad bug with saved files ending up completely empty (zero bytes), which I don't know if was a bug in my code or in Chrome.</details>
 - <details><summary>Offline support is not implemented.</summary>I've taken a few stabs at this, and <a href="https://github.com/1j01/jspaint/pull/144">I'm not the only one</a>, but there are some huge caveats, such as the development server not being able to live-reload without disabling the service worker.</details>
 
-### Electron
-
-I've also built it into a desktop app with [Electron][] and [Electron Forge][].
-You can download it from the [releases page][].
-
-![JS Paint running as a desktop app on macOS](images/meta/electron-app-screenshot-mac.png)
-
-Electron app features:
-- Native-like experience (runs in a window with no address bar)
-- Cross-platform (macOS, Windows, Linux)
-- Clipboard support
-- Files can be opened in various ways:
-  - **File > Open**
-  - Drag and drop onto window
-  - Drag and drop onto dock icon on macOS
-  - Drag and drop onto desktop shortcut
-  - **Right Click > Open With** in file manager (macOS and Linux)
-    - On Windows, you can manually paste the path to the executable into the Open With dialog, which you can find by right clicking the app in the taskbar, then right clicking the app's name, and selecting Properties. In the Shortcut tab, the Target field is the path to the executable. Once you open the app in this way, the app will show up in the Open With list, and if you select "Always", it will become the default app for that file type.
-  - Command line: type `jspaint path/to/file.png` in the terminal
-- **File > Save** will save directly to the file
-- **File > Set As Wallpaper (Tiled)** and **File > Set As Wallpaper (Centered)**
-- On macOS, an icon representing the currently open file is shown in the titlebar. You can drag this icon into other applications, for example to include the image you're editing in an email. The icon is dimmed while there are unsaved changes.
-
-<details><summary>Electron app limitations</summary>
-
-- Basics:
-  - Execution is blocked by default on Mac and Windows
-    - On macOS you need to Ctrl+click the file and then say Open
-    - On Windows, you need to say "More info" and then "Run anyway"
-    - I would need to pay a fee for code signing to avoid this. It's basically *security by extortion*.
-  - There are no automatic updates. Apparently I would need to pay a fee for code signing to get this free service.
-    - That said, **Help > About Paint** can tell you if JS Paint is out of date, at least in terms of news updates.
-  - Electron is out of date. It may, for instance, contain image decoding vulnerabilities that have since been fixed. However, I've taken precautions to sandbox the app and restrict write access to a list of files explicitly opened in the app, the list being controlled by the main process, separate from the renderer process which would handle image decoding.
-  - Only a single editor window can be opened at once.
-  - The File menu's recent files list is not implemented, nor are [OS-specific jump menus](https://www.electronjs.org/docs/latest/tutorial/recent-documents).
-- Minor details:
-  - A very confusing message is shown if you edit a document before clicking an Open link in the Manage Storage dialog.
-  - WebGL error messages tell you to refresh without offering a way to reload; also, calling the app a web page feels unpolished
-  - The File > Open dialog does not have an All Files (\*.\*) option, and the list of file types supported is not exhaustive; for example, AVIF images can be loaded but only by drag and drop
-  - Drag and drop shows two "Save changes to X?" dialogs on top of each other?
-- I'm not sure if all of these are still issues, need to retest them:
-  - Quit doesn't exit app completely, only closes the window if it's open... intended behavior? shouldn't right click > Quit really quit? https://stackoverflow.com/questions/44316306/how-to-quit-electron-app-on-mac
-  - Quit doesn't show/focus window when save changes prompt is shown on maybe mac/linux
-  - Ctrl+C doesn't exit on mac/linux https://github.com/electron/electron/issues/5273
-    - this is because of `editor_window.on("close")` calling `preventDefault` and may be a feature but needs to show/focus the window
-    - https://stackoverflow.com/questions/75362687/electron-js-processes-do-not-exit-on-app-quit
-  - Opening an SVG file also isn't working via command line argument (dragging onto the shortcut in File Explorer) even though dragging and dropping into the window works.  
-    - Seems to load load SVG as a palette... Is this what I was running into?
-
-</details>
-
-[Electron]: https://electronjs.org/
-[Electron Forge]: https://electronforge.io/
-[releases page]: https://github.com/1j01/jspaint/releases/
-
-
 ## Development Setup
 
 [Clone the repo.](https://help.github.com/articles/cloning-a-repository/)
@@ -365,18 +304,10 @@ Run `npm run format` to automatically fix formatting issues, or `npx eslint --fi
 
 The formatting rules are configured for compatibility with VS Code's built-in formatter.
 
-Run `npm test` to run browser-based tests with Cypress. (It's slow to start up and run tests, unfortunately.)
-
-Run `npm run accept` to accept any visual changes.
-This unfortunately re-runs all the tests, rather than accepting results of the previous test, so you could end up with different results than the previous test.
-If you use [GitHub Desktop](https://desktop.github.com/), you can view diffs of images, in four different modes.
-
-To open the Cypress UI, first run `npm run test:start-server`, then concurrently `npm run cy:open`
-
 ### Web App (https://jspaint.app)
 
-After you've installed dependencies with `npm i`,
-use `npm run dev` to start a live-reloading server.
+After installing dependencies with `npm install`, run `npm start` to serve the web app on port 1999.
+Use `npm run dev` to run the same live server alongside the CSS watcher.
 
 Make sure any layout-important styles go in `layout.css`.
 When updating `layout.css`, a right-to-left version of the stylesheet is generated, using [RTLCSS](https://rtlcss.com/).  
@@ -387,25 +318,10 @@ See [Control Directives](https://rtlcss.com/learn/usage-guide/control-directives
 There is a VS Code launch task for attaching to Chrome for debugging.
 See `.vscode/launch.json` for usage instructions.
 
-### Desktop App (Electron)
-
-- Install dependencies with `npm i`
-- Start the electron app with `npm run electron:start`
-
-[electron-debug][] is included, so you can use <kbd>F5</kbd>/<kbd>Ctrl+R</kbd> to reload and <kbd>F12</kbd>/<kbd>Ctrl+Shift+I</kbd> to open the devtools.
-
-You can build for production with `npm run electron:make`
-
-There is a VS Code launch task for debugging the Electron main process.
-For the renderer process, you can use the embedded Chrome DevTools.
-
-It is also possible to run JS Paint without Electron Forge, using `npx jspaint`; this is nice for testing the CLI, e.g. `npx jspaint --help` or `npx jspaint images/98.js.org.svg`
-
-New releases are built in GitHub Actions. See [Release Process](./release-process.md).
+See [Release Process](./release-process.md) for versioning and release steps.
 
 [Live Server]: https://github.com/1j01/live-server
 [Node.js]: https://nodejs.org/
-[electron-debug]: https://github.com/sindresorhus/electron-debug
 
 ## Deployment
 
@@ -839,4 +755,3 @@ JS Paint is free and open source software, licensed under the permissive [MIT li
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Repo stars](https://img.shields.io/github/stars/1j01/jspaint?label=GitHub%20Stars&style=social)](https://github.com/1j01/jspaint/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/1j01/jspaint?style=social)](https://github.com/1j01/jspaint/network/members)
-

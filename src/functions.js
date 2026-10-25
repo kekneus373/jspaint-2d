@@ -26,11 +26,9 @@ import { TOOL_CURVE, TOOL_FREE_FORM_SELECT, TOOL_POLYGON, TOOL_SELECT, TOOL_TEXT
 // expresses order in the URL as well as type
 const param_types = {
 	// settings
-	"eye-gaze-mode": "bool", // maps to "enlarge-ui"+"dwell-clicker"+"vertical-color-box-mode"+"easy-undo"
+	"eye-gaze-mode": "bool", // legacy setting maps to the remaining accessibility options
 	"enlarge-ui": "bool",
 	"easy-undo": "bool",
-	"dwell-clicker": "bool",
-	"head-tracker": "bool",
 	"vertical-color-box-mode": "bool", // could rename this to simply "vertical-color-box" or "vertical-palette"
 	"speech-recognition-mode": "bool", // could rename this to simply "voice"
 	// dev settings
@@ -749,12 +747,6 @@ function update_title() {
 		$("link[rel~='icon']").attr("href", "./images/icons/gay-es-paint-16x16-light-outline.png");
 	}
 
-	if (window.setRepresentedFilename) {
-		window.setRepresentedFilename(system_file_handle ?? "");
-	}
-	if (window.setDocumentEdited) {
-		window.setDocumentEdited(!saved);
-	}
 }
 
 /**
@@ -803,11 +795,6 @@ async function load_image_from_uri(uri) {
 	//   - The user may be just trying to paste text, not an image.
 	// - non-CORS-enabled URI
 	//   --> Use a CORS proxy! :)
-	//   - In electron, using a CORS proxy 1. is silly, 2. maybe isn't working.
-	//     --> Either proxy requests to the main process,
-	//         or configure headers in the main process to make requests work.
-	//         Probably the latter. @TODO
-	//         https://stackoverflow.com/questions/51254618/how-do-you-handle-cors-in-an-electron-app
 	// - invalid image / unsupported image format
 	// - image is no longer available on the live web
 	//   --> try loading from WayBack Machine :)
@@ -990,9 +977,6 @@ function open_from_image_info(info, callback, canceled, into_existing_session, f
 
 		if (info.source_blob instanceof File) {
 			file_name = info.source_blob.name;
-			// file.path is available in Electron (see https://www.electronjs.org/docs/api/file-object#file-object)
-			// @ts-ignore
-			system_file_handle = info.source_blob.path;
 		}
 		if (info.source_file_handle) {
 			system_file_handle = info.source_file_handle;
@@ -1272,7 +1256,6 @@ function are_you_sure(action, canceled, from_session_load) {
 		// However it's also shown inappropriately if you edit the document and then either:
 		// - type a #load: URL into the address bar such as
 		//   http://127.0.0.1:1999/#load:https://i.imgur.com/M5zcPuk.jpeg
-		// - click an Open link in the Manage Storage dialog in the Electron app
 		showMessageBox({
 			message: localize("You've modified the document while an existing document was loading.\nSave the new document?", file_name),
 			buttons: [
@@ -1457,7 +1440,7 @@ function show_resource_load_error_message(error) {
 			`);
 		}
 	} else {
-		// TODO: what to do in Electron? also most users don't know how to check the console
+		// TODO: most users don't know how to check the console
 		$message.html(`
 			<p>Failed to load image from URL.</p>
 			<p>Check your browser's devtools for details.</p>
@@ -1507,7 +1490,7 @@ function show_file_format_errors({ as_image_error, as_palette_error }) {
 
 	const only_palette_error = as_palette_error && !as_image_error; // update me if there are more error types
 	if (as_palette_error) {
-		let details = "";
+		let details;
 		if ("errors" in as_palette_error) {
 			details = `<ul dir="ltr">${as_palette_error.errors.map((error) => {
 				const format = error.__PATCHED_LIB_TO_ADD_THIS__format;
@@ -4149,10 +4132,7 @@ function sanity_check_blob(blob, okay_callback, magic_number_bytes, magic_wanted
 						// 	<p>${localize("Unexpected file format.")}</p>
 						// 	<p>${localize("An unsupported operation was attempted.")}</p>
 						// `,
-						message:
-							window.is_electron_app ?
-								"Writing images in this file format is not supported." :
-								"Your browser does not support writing images in this file format.",
+						message: "Your browser does not support writing images in this file format.",
 						iconID: "error",
 					});
 				}
@@ -4231,11 +4211,9 @@ export {
 };
 // Temporary globals until all dependent code is converted to ES Modules
 window.make_history_node = make_history_node; // used by app-state.js
-window.open_from_file = open_from_file; // used by electron-injected.js
-window.are_you_sure = are_you_sure; // used by app-localization.js, electron-injected.js
-window.show_error_message = show_error_message; // used by app-localization.js, electron-injected.js
-window.show_about_paint = show_about_paint; // used by electron-injected.js
+window.are_you_sure = are_you_sure; // used by app-localization.js
+window.show_error_message = show_error_message; // used by app-localization.js
+window.show_about_paint = show_about_paint;
 window.exit_fullscreen_if_ios = exit_fullscreen_if_ios; // used by app-localization.js
 window.get_tool_by_id = get_tool_by_id; // used by app-state.js
 window.make_monochrome_palette = make_monochrome_palette; // used by app-state.js
-window.sanity_check_blob = sanity_check_blob; // used by electron-injected.js

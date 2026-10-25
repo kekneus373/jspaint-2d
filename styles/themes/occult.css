@@ -33,10 +33,3 @@
 /* .transparent-mode-option.use-svg {
 	background-image: url("../../images/occult/options-transparency.svg");
 } */
-
-.toggle-dwell-clicking .button-icon {
-	background: url(../../images/dark/eye-gaze-pause.svg);
-}
-.dwell-clicker-mode.dwell-clicker-paused .toggle-dwell-clicking .button-icon {
-	background: url(../../images/dark/eye-gaze-unpause.svg);
-}

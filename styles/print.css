@@ -29,11 +29,6 @@ html, body, .jspaint {
 .textbox,
 .helper-layer,
 button,
-.tracky-mouse-hover-halo,
-.tracky-mouse-dwell-indicator {
-	display: none !important;
-}
-
 * {
 	background: transparent !important;
 }

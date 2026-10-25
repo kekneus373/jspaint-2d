@@ -3,7 +3,7 @@
 		".history", // VS Code "Local History" extension
 		"node_modules",
 		"lib",
-		"out", // Electron Forge output
+		"out", // generated build output
 		"*.png",
 		"*.gif",
 		"*.jpg",
@@ -27,7 +27,6 @@
 		"apng",
 		"appimage",
 		"appinstalled",
-		"argparse",
 		"atombgwht",
 		"autoupdating",
 		"beforeinstallprompt",
@@ -42,7 +41,6 @@
 		"checkmarks",
 		"clipart",
 		"Clippy",
-		"clmtrackr",
 		"cloudflared",
 		"clsid",
 		"cmaps",
@@ -140,7 +138,6 @@
 		"llpaper",
 		"localdomain",
 		"localforage",
-		"lookpath",
 		"lors",
 		"Lospec",
 		"lrgb",

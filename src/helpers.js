@@ -338,23 +338,6 @@ function get_file_extension(file_path_or_name) {
 }
 
 /**
- * accepts a file extension as input, or a file name, or path
- * @template {FileFormat} T
- * @param {T[]} formats
- * @param {string} file_path_or_name_or_ext  file path, name, or extension
- * @returns {T}  format object
- */
-function get_format_from_extension(formats, file_path_or_name_or_ext) {
-	const ext_match = file_path_or_name_or_ext.match(/\.([^.]+)$/);
-	const ext = ext_match ? ext_match[1].toLowerCase() : file_path_or_name_or_ext; // excluding dot
-	for (const format of formats) {
-		if (format.extensions.includes(ext)) {
-			return format;
-		}
-	}
-}
-
-/**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
  * Assumes r, g, and b are contained in the set [0, 255] and
@@ -454,7 +437,6 @@ export {
 	debounce,
 	from_canvas_coords,
 	get_file_extension,
-	get_format_from_extension,
 	get_help_folder_icon,
 	get_icon_for_tool,
 	get_icon_for_tools,
@@ -472,5 +454,4 @@ export {
 };
 // Temporary globals until all dependent code is converted to ES Modules
 window.$G = $G; // used by app-localization.js
-window.make_canvas = make_canvas; // used by app-state.js, electron-injected.js
-window.get_format_from_extension = get_format_from_extension; // used by electron-injected.js
+window.make_canvas = make_canvas; // used by app-state.js

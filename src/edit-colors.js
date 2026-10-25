@@ -388,9 +388,7 @@ function choose_color(initial_color, callback) {
 		select_hue_sat(event);
 
 		$(rainbow_canvas).on("pointermove", select_hue_sat);
-		if (event.pointerId !== 1234567890) { // for Dwell Clicker simulated clicks
-			rainbow_canvas.setPointerCapture(event.pointerId);
-		}
+		rainbow_canvas.setPointerCapture(event.pointerId);
 	});
 	$G.on("pointerup pointercancel", () => {
 		$(rainbow_canvas).off("pointermove", select_hue_sat);
@@ -409,9 +407,7 @@ function choose_color(initial_color, callback) {
 		select_lum(event);
 
 		$(luminosity_canvas).on("pointermove", select_lum);
-		if (event.pointerId !== 1234567890) { // for Dwell Clicker simulated clicks
-			luminosity_canvas.setPointerCapture(event.pointerId);
-		}
+		luminosity_canvas.setPointerCapture(event.pointerId);
 	});
 	$G.on("pointerup pointercancel", () => {
 		$(luminosity_canvas).off("pointermove", select_lum);
@@ -670,4 +666,3 @@ function choose_color(initial_color, callback) {
 }
 
 export { show_edit_colors_window };
-

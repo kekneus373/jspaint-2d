@@ -62,7 +62,7 @@
 	// Prevent accidental editing.
 	// This can always be overridden with the command "File: Toggle Active Editor Read-only in Session"
 	"files.readonlyInclude": {
-		// Electron Forge output
+		// generated build output
 		"out/**": true,
 		// Built/installed app (sometimes I follow error message links into the built app's code, and end up editing it by mistake)
 		"**/resources/app/**": true,

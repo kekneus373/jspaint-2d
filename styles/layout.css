@@ -99,14 +99,6 @@ html, body, .jspaint {
 .window:not(.squish) {
 	white-space: nowrap;
 }
-/* reset the above to avoid .tracky-mouse-error-message getting clipped (when webcam in use for example) */
-.tracky-mouse-window .tracky-mouse-canvas-overlay {
-	white-space: normal;
-}
-/* fix overlapped min/max labels and barely clickable slider due to 98.css slider styles */
-.tracky-mouse-labeled-slider {
-	height: 20px;
-}
 .component-area {
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -634,7 +626,7 @@ whereas it breaks component docking calculations if used to shift the colors box
 	width: 3px;
 	height: 3px;
 	z-index: 1;
-	pointer-events: none; /* important for Dwell Clicker mode */
+	pointer-events: none;
 }
 .grab-region {
 	/* the grab-region make handles way easier to grab by extending outside the visual representation of the handle */
@@ -730,7 +722,7 @@ whereas it breaks component docking calculations if used to shift the colors box
 }
 
 /* Fix label ordering for RTL layout (display inline labels can get super out of order with the checkboxes/inputs - very confusing!) */
-.window:not(.edit-colors-window):not(.tracky-mouse-window) .window-content label {
+.window:not(.edit-colors-window) .window-content label {
 	display: inline-flex;
 	flex-direction: row;
 	direction: ltr;

@@ -56,7 +56,7 @@ const localStore = {
 	 * @param {(error: Error) => void} [callback]
 	 */
 	set(key_or_pairs, value_or_callback, callback) {
-		let to_set = {};
+		let to_set;
 		if (typeof key_or_pairs === "string") {
 			to_set = {
 				[key_or_pairs]: value_or_callback,
@@ -82,4 +82,3 @@ const localStore = {
 };
 
 export { localStore };
-

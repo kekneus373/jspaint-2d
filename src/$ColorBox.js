@@ -91,7 +91,7 @@ function $ColorBox(vertical) {
 		let double_click_button = null;
 		let double_click_tid;
 		// @TODO: handle left+right click at same time
-		// can do this with mousedown instead of pointerdown, but may need to improve Dwell Clicker click simulation
+		// can do this with mousedown instead of pointerdown, but may need to improve synthetic click handling
 		$b.on("pointerdown", (e) => {
 			// @TODO: allow metaKey for ternary color, and selection cropping, on macOS?
 
@@ -170,4 +170,3 @@ export {
 	$Swatch,
 	update_$swatch
 };
-

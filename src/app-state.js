@@ -144,7 +144,7 @@ let file_name;
 /** @type {string | undefined} */
 let file_format;
 /**
- * For saving over opened file on Save. Can be different type for File System Access API vs Electron.
+ * For saving over an opened file. The browser's File System Access API uses a file handle.
  * @type {UserFileHandle}
  */
 let system_file_handle;

@@ -20,7 +20,6 @@ declare const saveAs: any;
 declare const FontDetective: any;
 declare const AnyPalette: any;
 declare const ImageTracer: any;
-declare const TrackyMouse: any;
 
 // Globals from scripts that are not converted to ESM yet,
 // and thus can't be imported. (I've been marking scripts as @ts-check as I convert them.)
@@ -132,7 +131,6 @@ declare function make_css_cursor(name: string, coords: [number, number], fallbac
 declare function make_canvas(width: number, height: number): PixelCanvas;
 declare function make_canvas(source: HTMLImageElement | HTMLCanvasElement | ImageData): PixelCanvas;
 declare function make_canvas(): PixelCanvas;
-declare function get_format_from_extension<T extends FileFormat>(formats: T[], file_path_or_name_or_ext: string): T;
 declare const $G: JQuery<Window>;
 
 // color-data.js
@@ -266,7 +264,6 @@ declare const $toolbox: JQuery<HTMLDivElement> & I$Component & I$ToolBox;
 declare const canvas_handles: Handles;
 declare const clipboardData: DataTransfer | null; // old IE?
 declare const debugKeepMenusOpen: boolean; // for debugging (otherwise you need `setTimeout(() => { debugger; }, 4000);`)
-declare const initial_system_file_handle: UserFileHandle | null;
 declare const menu_bar: MenuBar;
 declare const systemHookDefaults: SystemHooks;
 declare const systemHooks: SystemHooks;
@@ -286,7 +283,6 @@ interface Window {
 		(): PixelCanvas,
 	};
 	get_help_folder_icon: (file_name: string) => HTMLImageElement;
-	get_format_from_extension: <T extends FileFormat>(formats: T[], file_path_or_name_or_ext: string) => T;
 	// functions.js
 	get_tool_by_id(id: string): Tool;
 	make_monochrome_palette(rgba1?: number[], rgba2?: number[]): (string | CanvasPattern)[];
@@ -386,7 +382,6 @@ interface Window {
 	canvas_handles: Handles;
 	clipboardData: DataTransfer | null; // old IE?
 	debugKeepMenusOpen: boolean; // for debugging (otherwise you need `setTimeout(() => { debugger; }, 4000);`)
-	initial_system_file_handle: UserFileHandle | null;
 	menu_bar: MenuBar;
 	systemHookDefaults: SystemHooks;
 	systemHooks: SystemHooks;
@@ -462,17 +457,11 @@ interface Window {
 	search_page_$html: JQuery; // just for debugging
 	// image-manipulation.js
 	WEBGL_lose_context: WEBGL_lose_context | null; // just for debugging
-	// eye-gaze-mode.js and speech-recognition.js
+	// speech-recognition.js
 	untrusted_gesture: boolean;
 	// simulate-random-gestures.js
 	simulateRandomGesturesPeriodically: () => void;
 	drawRandomlySeed: number;
-	// electron-injected.js
-	is_electron_app?: boolean;
-	electron_is_dev?: boolean;
-	setDocumentEdited?: (edited: boolean) => void;
-	setRepresentedFilename?: (filename: string) => void;
-	setMenus?: (menus: any) => void; // TODO: types for OS-GUI.js menus
 	// OS-GUI's MenuBar.js
 	MenuBar: typeof MenuBar;
 	// Youtube API, used by vaporwave-fun.js, missing from @types/youtube
