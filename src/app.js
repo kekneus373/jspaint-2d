@@ -60,10 +60,9 @@ const getMimeType = (format) => "mimeType" in format ? format.mimeType : `applic
  * This API may be removed at any time (and perhaps replaced by something based around postMessage)
  * The API is documented in the README.md file.
  */
-window.systemHooks = window.systemHooks || {};
 /** @type {SystemHooks} */
 window.systemHookDefaults = {
-	// named to be distinct from various platform APIs (showSaveFilePicker, saveAs, electron's showSaveDialog; and saveFile is too ambiguous)
+	// named to be distinct from various platform APIs (showSaveFilePicker, saveAs; and saveFile is too ambiguous)
 	// could call it saveFileAs maybe but then it'd be weird that you don't pass in the file directly
 	showSaveFileDialog: async ({ formats, defaultFileName, defaultPath, defaultFileFormatID, getBlob, savedCallbackUnreliable, dialogTitle }) => {
 
@@ -72,16 +71,15 @@ window.systemHookDefaults = {
 		// In particular, some formats are ambiguous with the file name, e.g. different bit depths of BMP files.
 		// So, it's a tradeoff with the benefit of overwriting on Save.
 		// https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker
-		// Also, if you're using accessibility options Speech Recognition or Dwell Clicker,
+		// Also, if you're using Speech Recognition,
 		// `showSaveFilePicker` fails based on a notion of it not being a "user gesture".
 		// `saveAs` will likely also fail on the same basis,
 		// but at least in chrome, there's a "Downloads Blocked" icon with a popup where you can say Always Allow.
 		// I can't detect when it's allowed or blocked, but `saveAs` has a better chance of working,
-		// so for Speech Recognition and Dwell Clicker, I set a global flag temporarily to disable File System Access API (window.untrusted_gesture).
+		// so for Speech Recognition, I set a global flag temporarily to disable File System Access API (window.untrusted_gesture).
 		if (window.showSaveFilePicker && !window.untrusted_gesture && enable_fs_access_api) {
 			// We can't get the selected file type, not even from newHandle.getFile()
 			// so limit formats shown to a set that can all be used by their unique file extensions
-			// formats = formats_unique_per_file_extension(formats);
 			// OR, show two dialogs, one for the format and then one for the save location.
 			const { newFileFormatID } = await save_as_prompt({ dialogTitle, defaultFileName, defaultFileFormatID, formats, promptForName: false });
 			const new_format = formats.find((format) => format.formatID === newFileFormatID);
@@ -157,7 +155,6 @@ window.systemHookDefaults = {
 					return await doItAgain(`File extension '.${newFileExtension}' does not match the selected file type ${new_format.name}.`);
 				}
 				// const new_format =
-				// 	get_format_from_extension(formats, newHandle.name) ||
 				// 	formats.find((format)=> format.formatID === defaultFileFormatID);
 				// const blob = await getBlob(new_format && new_format.formatID);
 				const writableStream = await newHandle.createWritable();
@@ -204,7 +201,7 @@ window.systemHookDefaults = {
 		if (window.untrusted_gesture) {
 			// We can't show a file picker RELIABLY.
 			// FIXME: double error message
-			show_error_message("Sorry, a file picker cannot be shown when using Speech Recognition or Dwell Clicker. You must click File > Open directly with the mouse, or press Ctrl+O on the keyboard.");
+			show_error_message("Sorry, a file picker cannot be shown when using Speech Recognition. You must click File > Open directly with the mouse, or press Ctrl+O on the keyboard.");
 			throw new Error("can't show file picker reliably");
 		}
 		if (window.showOpenFilePicker && enable_fs_access_api) {
@@ -303,6 +300,7 @@ window.systemHookDefaults = {
 	},
 };
 
+window.systemHooks = window.systemHooks || { ...window.systemHookDefaults };
 for (const [key, defaultValue] of Object.entries(window.systemHookDefaults)) {
 	window.systemHooks[key] = window.systemHooks[key] || defaultValue;
 }
@@ -311,20 +309,6 @@ for (const [key, defaultValue] of Object.entries(window.systemHookDefaults)) {
 
 // #region URL Params
 const update_from_url_params = () => {
-	// Dwell Clicker
-	// (Head Tracker implies Dwell Clicker for now, but could be made independent if Tracky Mouse supports other modes in the future.)
-	if (location.hash.match(/dwell-clicker|head-tracker/i)) {
-		if (!$("body").hasClass("dwell-clicker-mode")) {
-			$("body").addClass("dwell-clicker-mode");
-			$G.triggerHandler("dwell-clicker-toggled");
-		}
-	} else {
-		if ($("body").hasClass("dwell-clicker-mode")) {
-			$("body").removeClass("dwell-clicker-mode");
-			$G.triggerHandler("dwell-clicker-toggled");
-		}
-	}
-
 	// Enlarge UI
 	if (location.hash.match(/enlarge-ui/i)) {
 		if (!$("body").hasClass("enlarge-ui")) {
@@ -367,19 +351,6 @@ const update_from_url_params = () => {
 			$("body").removeClass("easy-undo-mode");
 			$G.triggerHandler("easy-undo-mode-toggled");
 			$G.triggerHandler("theme-load"); // signal layout change (just copying pattern thoughtlessly)
-		}
-	}
-
-	// Head Tracker Mode
-	if (location.hash.match(/head-tracker/i)) {
-		if (!$("body").hasClass("head-tracker-mode")) {
-			$("body").addClass("head-tracker-mode");
-			$G.triggerHandler("head-tracker-toggled");
-		}
-	} else {
-		if ($("body").hasClass("head-tracker-mode")) {
-			$("body").removeClass("head-tracker-mode");
-			$G.triggerHandler("head-tracker-toggled");
 		}
 	}
 
@@ -455,7 +426,6 @@ if (location.search.match(/eye-gaze-mode/) || location.hash.match(/eye-gaze-mode
 	change_some_url_params({
 		"eye-gaze-mode": false,
 		"enlarge-ui": true,
-		"dwell-clicker": true,
 		"vertical-color-box-mode": true,
 		"easy-undo": true,
 	}, { replace_history_state: true });
@@ -765,11 +735,6 @@ for (const [menu_item, menu_item_element] of traverse_menu(menus["E&xtras"], ext
 }
 $("<style>").text(emoji_css).appendTo(menu_document.head);
 
-// Electron menu integration
-if (window.is_electron_app) {
-	window.setMenus(menus);
-}
-
 // #endregion
 
 let $toolbox = $ToolBox(tools);
@@ -833,10 +798,7 @@ $("body").on("dragover dragenter", (/** @type {JQuery.DragOverEvent | JQuery.Dra
 		// @TODO: sort files/items in priority of image, theme, palette
 		// and then try loading them in series, with async await to avoid race conditions?
 		// or maybe support opening multiple documents in tabs
-		// Note: don't use FS Access API in Electron app because:
-		// 1. it's faulty (permissions problems, 0 byte files maybe due to the perms problems)
-		// 2. we want to save the file.path, which the dt.files code path takes care of
-		if (window.FileSystemHandle && !window.is_electron_app) {
+		if (window.FileSystemHandle) {
 			for (const item of dt.items) {
 				// kind will be "file" for file/directory entries.
 				if (item.kind === "file") {
@@ -1135,8 +1097,8 @@ $G.on("keydown", (e) => {
 				break;
 
 			// These shortcuts are mostly reserved by browsers,
-			// but they are allowed in Electron.
-			// The shortcuts are hidden in the menus (or changed) when not in Electron,
+			// but they are allowed in the browser.
+			// The shortcuts are hidden or changed in browser menus,
 			// to prevent accidental closing/refreshing.
 			// I'm supporting Alt+<shortcut> here (implicitly) as a workaround (and showing this in the menus in some cases).
 			// Also, note that Chrome allows some shortcuts to be overridden in fullscreen (but showing/hiding the shortcuts would be confusing).
@@ -1322,16 +1284,6 @@ localStore.get({
 	});
 });
 
-if (window.initial_system_file_handle) {
-	systemHooks.readBlobFromHandle(window.initial_system_file_handle).then((file) => {
-		if (file) {
-			open_from_file(file, window.initial_system_file_handle);
-		}
-	}, (error) => {
-		// this handler is not always called, sometimes error message is shown from readBlobFromHandle
-		show_error_message(`Failed to open file ${window.initial_system_file_handle}`, error);
-	});
-}
 // #endregion
 
 // #region Palette Updating From Theme
@@ -1363,7 +1315,7 @@ function update_fill_and_stroke_colors_and_lineWidth(selected_tool) {
 			((reverse !== reverse_because_fill_only) ? "background" : "foreground");
 	main_ctx.fillStyle = fill_color =
 		main_ctx.strokeStyle = stroke_color =
-		selected_colors[color_k];
+			selected_colors[color_k];
 
 	/** @type {ColorSelectionSlot} */
 	let fill_color_k =
@@ -1512,8 +1464,6 @@ $canvas_area.on("pointerdown", (event) => {
 	}
 
 	if (pointers.every((pointer) =>
-		// prevent multitouch panning in case of synthetic events from Dwell Clicker
-		pointer.pointerId !== 1234567890 &&
 		// prevent multitouch panning in case of dragging across iframe boundary with a mouse/pen
 		// Note: there can be multiple active primary pointers, one per pointer type
 		!(pointer.isPrimary && (pointer.pointerType === "mouse" || pointer.pointerType === "pen"))
@@ -1621,10 +1571,6 @@ $canvas.on("pointerdown", (e) => {
 		cancel(false, discard_document_state);
 		pointer_active = false; // NOTE: pointer_active used in cancel(); must be set after cancel()
 
-		// in Dwell Clicker mode, allow drawing with mouse after canceling dwell gesture with mouse
-		pointers = pointers.filter((pointer) =>
-			pointer.pointerId !== 1234567890
-		);
 		return;
 	}
 

@@ -281,8 +281,6 @@ body {
 	width: 18px;
 	height: 18px;
 }
-.color-button, /* this outer one is only for detection for the hover halo in Dwell Clicker mode */
-.edit-colors-window .swatch, /* this outer one is only for detection for the hover halo in Dwell Clicker mode */
 .color-button canvas,
 .color-selection canvas,
 .edit-colors-window .swatch canvas,
@@ -418,13 +416,6 @@ body {
 .floating-undo-button .button-icon {
 	background: url(../../images/classic/undo.svg);
 }
-.toggle-dwell-clicking .button-icon {
-	background: url(../../images/classic/eye-gaze-pause.svg);
-}
-.dwell-clicker-mode.dwell-clicker-paused .toggle-dwell-clicking .button-icon {
-	background: url(../../images/classic/eye-gaze-unpause.svg);
-}
-
 .menus,
 .component-area,
 .status-area {

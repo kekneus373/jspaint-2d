@@ -24,7 +24,7 @@ const menus = {
 	[localize("&File")]: [
 		{
 			label: localize("&New"),
-			...shortcut(window.is_electron_app ? "Ctrl+N" : "Ctrl+Alt+N"), // Ctrl+N opens a new browser window
+			...shortcut("Ctrl+Alt+N"), // Ctrl+N opens a new browser window
 			speech_recognition: [
 				"new", "new file", "new document", "create new document", "create a new document", "start new document", "start a new document",
 			],
@@ -217,13 +217,12 @@ const menus = {
 		MENU_DIVIDER,
 		{
 			label: localize("Recent File"),
-			enabled: false, // @TODO for desktop app
+			enabled: false,
 			description: localize(""),
 		},
 		MENU_DIVIDER,
 		{
 			label: localize("E&xit"),
-			...shortcut(window.is_electron_app ? "Alt+F4" : ""), // Alt+F4 closes the browser window (in most window managers)
 			speech_recognition: [
 				"exit application", "exit paint", "close paint window",
 			],
@@ -242,7 +241,7 @@ const menus = {
 					// but that would be inconsistent, as it wouldn't close the window after using File > New or File > Open.
 					// I could make it so that it uses replaceState when opening a new document (starting a new session);
 					// that would prevent you from using Alt+Left to go back to the previous document, but that may be acceptable
-					// for a desktop app experience, where the back button is already hidden.
+					// for an app experience, where the back button is already hidden.
 					// That said, if you just installed the PWA, it will have history already (even if just the New Tab page),
 					// as the tab is converted to a window, and in that case,
 					// it would be unable to close, again being inconsistent, but less so.
@@ -253,7 +252,7 @@ const menus = {
 						// Note that e.g. (()=>{}).bind().toString() gives "function () { [native code] }"
 						// so the window.close() must not use bind() (not that that's common practice anyway)
 						const close_overridden = frameElement && window.close && !/\{\s*\[native code\]\s*\}/.test(window.close.toString());
-						if (close_overridden || window.is_electron_app) {
+						if (close_overridden) {
 							window.close();
 							return;
 						}
@@ -391,7 +390,6 @@ const menus = {
 	[localize("&View")]: [
 		{
 			label: localize("&Tool Box"),
-			...shortcut(window.is_electron_app ? "Ctrl+T" : ""), // Ctrl+T opens a new browser tab, Ctrl+Alt+T opens a Terminal in Ubuntu, and Ctrl+Shift+Alt+T feels silly.
 			speech_recognition: [
 				"toggle tool box", "toggle tools box", "toggle toolbox", "toggle tool palette", "toggle tools palette",
 				// @TODO: hide/show
@@ -458,7 +456,6 @@ const menus = {
 			submenu: [
 				{
 					label: localize("&Normal Size"),
-					...shortcut(window.is_electron_app ? "Ctrl+PgUp" : ""), // Ctrl+PageUp cycles thru browser tabs in Chrome & Firefox; can be overridden in Chrome in fullscreen only
 					speech_recognition: [
 						"reset zoom", "zoom to normal size",
 						"zoom to 100%", "set zoom to 100%", "set zoom 100%",
@@ -474,7 +471,6 @@ const menus = {
 				},
 				{
 					label: localize("&Large Size"),
-					...shortcut(window.is_electron_app ? "Ctrl+PgDn" : ""), // Ctrl+PageDown cycles thru browser tabs in Chrome & Firefox; can be overridden in Chrome in fullscreen only
 					speech_recognition: [
 						"zoom to large size",
 						"zoom to 400%", "set zoom to 400%", "set zoom 400%",
@@ -612,7 +608,7 @@ const menus = {
 		// @TODO: speech recognition: terms that apply to selection
 		{
 			label: localize("&Flip/Rotate"),
-			...shortcut((window.is_electron_app && !window.electron_is_dev) ? "Ctrl+R" : "Ctrl+Alt+R"), // Ctrl+R reloads the browser tab (or Electron window in dev mode via electron-debug)
+			...shortcut("Ctrl+Alt+R"), // Ctrl+R reloads the browser tab
 			speech_recognition: [
 				"flip",
 				"rotate",
@@ -624,7 +620,7 @@ const menus = {
 		},
 		{
 			label: localize("&Stretch/Skew"),
-			...shortcut(window.is_electron_app ? "Ctrl+W" : "Ctrl+Alt+W"), // Ctrl+W closes the browser tab
+			...shortcut("Ctrl+Alt+W"), // Ctrl+W closes the browser tab
 			speech_recognition: [
 				"stretch", "scale", "resize image",
 				"skew",
@@ -663,7 +659,7 @@ const menus = {
 		},
 		{
 			label: localize("&Clear Image"),
-			...shortcut((window.is_electron_app || !looksLikeChrome) ? "Ctrl+Shift+N" : ""), // Ctrl+Shift+N opens incognito window in chrome
+			...shortcut(!looksLikeChrome ? "Ctrl+Shift+N" : ""), // Ctrl+Shift+N opens incognito window in chrome
 			speech_recognition: [
 				"clear image", "clear canvas", "clear picture", "clear page", "clear drawing",
 				// @TODO: erase?
@@ -1193,73 +1189,6 @@ const menus = {
 			)),
 		},
 		{
-			emoji_icon: "🧑",
-			// label: localize("Head Tracking"),
-			// label: localize("M&ove Cursor With Head"),
-			label: localize("Head Tracker"), // adding (Experimental) makes it too long, "WIP" or "Beta" feels too techy
-			speech_recognition: [
-				"head tracking", "head tracker", "move cursor with head", "control cursor with head", "mouse with head", "mouse cursor with head",
-				"face tracking", "face tracker", "move cursor with face", "control cursor with face", "mouse with face", "mouse cursor with face",
-				"head mouse", "face mouse", "facial mouse",
-				"head cursor", "face cursor", "facial cursor",
-				"head pointer", "face pointer", "facial pointer",
-				"head control", "face control", "facial control",
-				"head movement", "face movement", "facial movement",
-				"head motion", "face motion", "facial motion",
-				"head gestures", "face gestures", "facial gestures",
-				"tracky mouse", // name of the library
-			],
-			checkbox: {
-				toggle: () => {
-					if (/head-tracker/i.test(location.hash)) {
-						change_url_param("head-tracker", false);
-					} else {
-						change_url_param("head-tracker", true);
-					}
-				},
-				check: () => {
-					return /head-tracker/i.test(location.hash);
-				},
-			},
-			description: localize("Controls the cursor with head movements."),
-		},
-		// Later on I'll probably merge the Head Tracker and Dwell Clicker options into a Tracky Mouse option,
-		// or I'll create a preferences screen, where I'll be able to better clarify the relationships between features.
-		{
-			emoji_icon: "⏱️",
-			// label: localize("Dwell &Click"),
-			label: localize("Dwell &Clicker"),
-			speech_recognition: [
-				"dwell clicking", "dwell click", "dwell clicker", "auto click", "auto clicker", "auto clicking", "click automatically",
-				"stop clicking", "stop auto clicking", "stop auto click", "stop auto clicker", "stop dwell clicking", "stop dwell click", "stop dwell clicker",
-			],
-			checkbox: {
-				toggle: () => {
-					if (/head-tracker/i.test(location.hash)) {
-						// @TODO: confirmation dialog that you could cancel with dwell clicking!
-						// Or: make head tracker work independently of dwell clicking, i.e. with facial gestures
-						// if (confirm("This will disable head tracker mode.")) {
-						// change_some_url_params({
-						// 	"head-tracker": false,
-						// 	"dwell-clicker": false,
-						// });
-						// }
-					} else if (/dwell-clicker/i.test(location.hash)) {
-						change_url_param("dwell-clicker", false);
-					} else {
-						change_url_param("dwell-clicker", true);
-					}
-				},
-				check: () => {
-					return /dwell-clicker|head-tracker/i.test(location.hash);
-				},
-			},
-			enabled: () => {
-				return !/head-tracker/i.test(location.hash);
-			},
-			description: localize("Clicks automatically after hovering in one place."),
-		},
-		{
 			emoji_icon: "🔍",
 			// label: localize("&Enlarge Buttons"), // too specific; it also enlarges windows and other UI elements
 			label: localize("&Enlarge UI"), // a bit technical, but hopefully common enough
@@ -1438,10 +1367,9 @@ export { menus };
 
 /**
  * Expands a shortcut label into an object with the label and a corresponding ARIA key shortcuts value.
- * Could handle "CtrlOrCmd" like Electron does, here, or just treat "Ctrl" as control or command.
+ * Could handle "CtrlOrCmd" here, or just treat "Ctrl" as control or command.
  * Of course it would be more ergonomic if OS-GUI.js handled this sort of thing,
- * and I have thought about rewriting the OS-GUI API to mimic Electron's.
- * I also have some munging logic in electron-main.js related to this.
+ * and I have thought about rewriting the OS-GUI API to provide platform-specific shortcuts.
  * @param {string} shortcutLabel
  * @returns {{shortcutLabel?: string, ariaKeyShortcuts?: string}}
  */

@@ -90,7 +90,7 @@ button:not([disabled]):active,
 	border-style: solid !important;
 	padding: 7px !important;
 	background-color: transparent !important;
-	/* border-radius affects hover outline in Dwell Clicker mode, as well as any clipping (with overflow: hidden), and box-shadows */
+	/* border-radius affects clipping (with overflow: hidden) and box-shadows */
 	border-radius: 10px !important;
 	/* box-shadow can't be applied directly here, because of the border-image fill (as far as I know; might want to test that assumption) */
 }
@@ -187,15 +187,6 @@ button:not([disabled]):active,
 	background-image: url("../../images/bubblegum/bubblegum-tools.svg");
 	background-position: calc(-16px * (var(--icon-index) * 2 + 1)) -16px;
 	filter: drop-shadow(2px 3px 1px rgba(53, 54, 134, 0.5));
-}
-
-.toggle-dwell-clicking .button-icon {
-	background: url(../../images/bubblegum/eye-gaze-pause-128x128.png);
-	background-size: 100% 100%;
-}
-.dwell-clicker-mode.dwell-clicker-paused .toggle-dwell-clicking .button-icon {
-	background: url(../../images/bubblegum/eye-gaze-unpause-128x128.png);
-	background-size: 100% 100%;
 }
 
 /* Need multiple specificity levels to override Modern theme. */

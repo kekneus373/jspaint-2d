@@ -5,7 +5,7 @@ __diff_output__
 # cypress-image-snapshot images of the whole cypress UI
 *(failed).snap.png
 
-# electron forge output
+# generated build output
 out/
 
 # npm
